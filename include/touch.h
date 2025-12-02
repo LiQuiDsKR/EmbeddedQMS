@@ -7,11 +7,13 @@
 #define TOUCH_CS 5
 #define TOUCH_IRQ 17
 
-// 터치 보정값 (기존 프로젝트 값 유지)
-#define RAW_X_MIN 205
-#define RAW_X_MAX 3835
-#define RAW_Y_MIN 435
-#define RAW_Y_MAX 3715
+// 터치 보정값 (실측 좌표계 기준 - 90도 회전)
+// Raw X: 3800(LT) ~ 250(RB)
+// Raw Y: 400(LT) ~ 3800(RB)
+#define RAW_X_MIN 280
+#define RAW_X_MAX 3800
+#define RAW_Y_MIN 350
+#define RAW_Y_MAX 3720
 
 class TouchModule {
 private:

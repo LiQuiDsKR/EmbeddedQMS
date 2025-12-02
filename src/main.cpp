@@ -30,11 +30,6 @@
 Adafruit_ST7789 tft = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
 TouchModule touchModule(SCREEN_WIDTH, SCREEN_HEIGHT);
 
-// 함수 선언
-void drawButton(int x, int y, int w, int h, const char* label, uint16_t color);
-bool isButtonPressed(int touchX, int touchY, int btnX, int btnY, int btnW, int btnH);
-void flashButton(int x, int y, int w, int h, const char* label, uint16_t color);
-
 void setup() {
   Serial.begin(115200);
   delay(1000);
@@ -62,18 +57,13 @@ void setup() {
   tft.setTextColor(COLOR_WHITE);
   tft.setTextSize(2);
   tft.setCursor(10, 10);
-  tft.println("Touch Display");
-  tft.println("Ready!");
+  tft.println("Touch Test");
   tft.setTextSize(1);
-  tft.setCursor(10, 50);
-  tft.println("Touch screen to test");
-  
-  // 간단한 UI 요소 그리기
-  drawButton(20, 80, 200, 60, "Button 1", COLOR_BLUE);
-  drawButton(20, 160, 200, 60, "Button 2", COLOR_GREEN);
+  tft.setCursor(10, 40);
+  tft.println("Draw with your finger!");
   
   Serial.println("Setup complete!");
-  Serial.println("Touch the screen...");
+  Serial.println("Touch the screen to draw...");
   Serial.println("---------------------------------");
 }
 
@@ -82,69 +72,28 @@ void loop() {
   if (touchModule.isTouched()) {
     // Raw 좌표 출력
     TS_Point p = touchModule.getRawPoint();
-    Serial.print("Raw Touch: X=");
+    
+    // 화면 좌표로 변환
+    int screenX, screenY;
+    touchModule.getScreenCoordinates(screenX, screenY);
+    
+    // 범위 제한
+    screenX = constrain(screenX, 0, SCREEN_WIDTH - 1);
+    screenY = constrain(screenY, 0, SCREEN_HEIGHT - 1);
+    
+    // 시리얼 출력
+    Serial.print("Raw: X=");
     Serial.print(p.x);
     Serial.print(", Y=");
     Serial.print(p.y);
-    
-    // 화면 좌표로 변환
-    int screenX = touchModule.mapX(p.x);
-    int screenY = touchModule.mapY(p.y);
-    
-    // 범위 제한
-    screenX = constrain(screenX, 0, SCREEN_WIDTH);
-    screenY = constrain(screenY, 0, SCREEN_HEIGHT);
-    
     Serial.print(" | Screen: X=");
     Serial.print(screenX);
     Serial.print(", Y=");
     Serial.println(screenY);
     
     // 터치 위치에 점 그리기
-    tft.fillCircle(screenX, screenY, 3, COLOR_RED);
+    tft.drawPixel(screenX, screenY, COLOR_WHITE);
     
-    // 버튼 영역 체크
-    if (isButtonPressed(screenX, screenY, 20, 80, 200, 60)) {
-      Serial.println(">>> Button 1 PRESSED!");
-      flashButton(20, 80, 200, 60, "Button 1", COLOR_BLUE);
-    }
-    else if (isButtonPressed(screenX, screenY, 20, 160, 200, 60)) {
-      Serial.println(">>> Button 2 PRESSED!");
-      flashButton(20, 160, 200, 60, "Button 2", COLOR_GREEN);
-    }
-    
-    delay(100);  // 디바운스
+    delay(10);  // 부드러운 그리기
   }
-}
-
-// 버튼 그리기 함수
-void drawButton(int x, int y, int w, int h, const char* label, uint16_t color) {
-  tft.fillRoundRect(x, y, w, h, 8, color);
-  tft.drawRoundRect(x, y, w, h, 8, COLOR_WHITE);
-  
-  tft.setTextColor(COLOR_WHITE);
-  tft.setTextSize(2);
-  
-  // 텍스트 중앙 정렬 (수동 계산)
-  int16_t labelLen = strlen(label) * 12;  // 대략적인 문자 폭
-  int16_t textX = x + (w - labelLen) / 2;
-  int16_t textY = y + (h - 16) / 2;  // 텍스트 높이 고려
-  
-  tft.setCursor(textX, textY);
-  tft.print(label);
-}
-
-// 버튼 눌림 확인 함수
-bool isButtonPressed(int touchX, int touchY, int btnX, int btnY, int btnW, int btnH) {
-  return (touchX >= btnX && touchX <= (btnX + btnW) && 
-          touchY >= btnY && touchY <= (btnY + btnH));
-}
-
-// 버튼 눌림 효과 함수
-void flashButton(int x, int y, int w, int h, const char* label, uint16_t color) {
-  // 밝게
-  drawButton(x, y, w, h, label, COLOR_WHITE);
-  delay(100);
-  // 원래 색상으로
-  drawButton(x, y, w, h, label, color);
 }

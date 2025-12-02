@@ -17,18 +17,21 @@ TS_Point TouchModule::getRawPoint() {
 }
 
 int TouchModule::mapX(int rawX) {
+    // Raw X를 Screen X로 매핑 (역방향)
     return map(rawX, RAW_X_MAX, RAW_X_MIN, 0, screenWidth);
 }
 
 int TouchModule::mapY(int rawY) {
-    return map(rawY, RAW_Y_MAX, RAW_Y_MIN, 0, screenHeight);
+    // Raw Y를 Screen Y로 매핑 (정방향)
+    return map(rawY, RAW_Y_MIN, RAW_Y_MAX, 0, screenHeight);
 }
 
 void TouchModule::getScreenCoordinates(int& screenX, int& screenY) {
     if (isTouched()) {
         TS_Point p = getRawPoint();
-        screenX = mapX(p.x);
-        screenY = mapY(p.y);
+        // 축 교환: Raw X → Screen Y, Raw Y → Screen X
+        screenX = mapY(p.y);
+        screenY = mapX(p.x);
     }
 }
 
