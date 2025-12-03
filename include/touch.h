@@ -11,7 +11,7 @@
 // Raw X: 3800(LT) ~ 250(RB)
 // Raw Y: 400(LT) ~ 3800(RB)
 #define RAW_X_MIN 280
-#define RAW_X_MAX 3800
+#define RAW_X_MAX 3700
 #define RAW_Y_MIN 350
 #define RAW_Y_MAX 3720
 
